@@ -10,7 +10,7 @@ from apiclient.errors import HttpError
 from oauth2client.tools import argparser
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
-from oauth2client.tools import run
+from oauth2client import tools
 
 # CLIENT_SECRETS_FILE, name of a file containing the OAuth 2.0 information for
 # this application, including client_id and client_secret. You can acquire an
@@ -55,7 +55,8 @@ def get_authenticated_service():
   credentials = storage.get()
 
   if credentials is None or credentials.invalid:
-    credentials = run(flow, storage)
+      flags = tools.argparser.parse_args(args=[])
+      credentials = tools.run_flow(flow, storage, flags)
 
   return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     http=credentials.authorize(httplib2.Http()))
