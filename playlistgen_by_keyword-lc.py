@@ -94,7 +94,12 @@ def youtube_playlist_from_keyword(options):
 
   print "Videos:\n", "\n".join(videos), "\n"
   print "Channels:\n", "\n".join(channels), "\n"
-  print "Playlists:\n", "\n".join(playlists), "\n" 
+  print "Playlists:\n", "\n".join(playlists), "\n"
+
+  # existing_playlists = youtube.playlists().list(
+  #     part="title",
+  #     mine=True
+  # ).execute()
 
   playlists_insert_response = youtube.playlists().insert(
     part="snippet,status",
@@ -124,10 +129,27 @@ def youtube_playlist_from_keyword(options):
 		)
 	  ).execute()
 	  print "Added video %s to playlist %s " % (search_result["id"]["videoId"],playlist_id) 
-	  			
+
+# Remove keyword arguments that are not set
+def remove_empty_kwargs(**kwargs):
+  good_kwargs = {}
+  if kwargs is not None:
+    for key, value in kwargs.iteritems():
+      if value:
+        good_kwargs[key] = value
+  return good_kwargs
+
+def playlists_list_by_channel_id(client, **kwargs):
+  # See full sample for function
+  kwargs = remove_empty_kwargs(**kwargs)
+
+  response = client.playlists().list(
+    **kwargs
+  ).execute()
+
 if __name__ == "__main__":
   argparser.add_argument("--q", help="Search term", default="Google")
-  argparser.add_argument("--max-results", help="Max results", default=25)
+  argparser.add_argument("--max-results", help="Max results", default=50)
   args = argparser.parse_args()
 
   try:
